@@ -13,8 +13,8 @@
         "db:seed": "ts-node prisma/seed.ts",
         "db:reset": "prisma migrate reset --force",
         "postinstall": "prisma generate",
+        "start": "prisma migrate deploy && ts-node -r tsconfig-paths/register src/index.ts",
         "build": "prisma generate && tsc",
-        "start": "node dist/index.js",
         "deploy": "prisma migrate deploy && prisma generate"
     },
     "keywords": [],
