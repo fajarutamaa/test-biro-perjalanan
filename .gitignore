@@ -10,17 +10,27 @@ node_modules/
 .env.test
 .env.production
 
+# Testing folders - tambahkan variasi nama folder test
+/tests
+/test
+__tests__/
+*.test.*
+*.spec.*
+
 # Prisma
 /generated
 /prisma/migrations
 
+# Coverage
 /coverage
+.nyc_output
 
 # Build output
 dist/
 build/
-*.js
-*.js.map
+# Hapus *.js dan *.js.map jika Anda butuh file JS lain
+# *.js
+# *.js.map
 *.d.ts
 
 # Logs
@@ -39,10 +49,6 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
-
-# Testing
-coverage/
-.nyc_output
 
 # Misc
 .DS_Store
