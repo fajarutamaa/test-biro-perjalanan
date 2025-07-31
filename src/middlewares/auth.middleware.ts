@@ -1,11 +1,23 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import config from '../config'
-// Import JwtPayload from the express types file
-import { JwtPayload } from '../types/express'
-import { UnauthorizedError } from '@/utils/error'
 
-export const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
+// Define JwtPayload interface locally if not imported
+interface JwtPayload {
+    user_id: string
+    email: string
+    role_id: number
+    name?: string
+    iat?: number
+    exp?: number
+}
+
+// Extend Request interface locally
+interface AuthenticatedRequest extends Request {
+    user?: JwtPayload
+}
+
+export const authenticateJWT = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -24,7 +36,7 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
 }
 
 export function authorizeRoles(...allowedRoles: number[]) {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
         const user = req.user
         
         if (!user || !allowedRoles.includes(user.role_id)) {

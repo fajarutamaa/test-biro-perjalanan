@@ -75,7 +75,7 @@ export class TripController {
     getAllByUserId = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = (req as any).user;
-            const trips = await this.service.findAllByUserIdAndStatus(req.user?.user_id || '')
+            const trips = await this.service.findAllByUserIdAndStatus(userId)
 
             const serializedTrips = await Promise.all(
                 trips.map(async (trip) => {
