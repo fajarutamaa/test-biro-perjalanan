@@ -1,13 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import config from '../config'
-import { JwtPayload } from '@/types'
+// Import JwtPayload from the express types file
+import { JwtPayload } from '../types/express'
 import { UnauthorizedError } from '@/utils/error'
-
-// Remove this interface since we're using global declaration
-// export interface AuthenticatedRequest extends Request {
-//     user?: JwtPayload
-// }
 
 export const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization
@@ -23,14 +19,12 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
         req.user = decoded
         next()
     } catch (err) {
-        // Use res.status instead of throwing error for middleware
         return res.status(401).json({ error: 'Invalid or expired token' })
     }
 }
 
 export function authorizeRoles(...allowedRoles: number[]) {
     return (req: Request, res: Response, next: NextFunction) => {
-        // TypeScript should now recognize req.user
         const user = req.user
         
         if (!user || !allowedRoles.includes(user.role_id)) {
