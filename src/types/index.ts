@@ -10,3 +10,11 @@ export enum Role {
     ADMIN = 2,
     GENERAL_USER = 3,
 }
+
+export interface AuthenticatedRequest extends Request {
+  user: {
+    user_id: string;
+    email: string;
+    role_id: number;
+  };
+}
