@@ -38,7 +38,7 @@ export const authenticateJWT = (req: AuthenticatedRequest, res: Response, next: 
 export function authorizeRoles(...allowedRoles: number[]) {
     return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
         const user = req.user
-        
+
         if (!user || !allowedRoles.includes(user.role_id)) {
             return res.status(403).json({
                 code: 403,

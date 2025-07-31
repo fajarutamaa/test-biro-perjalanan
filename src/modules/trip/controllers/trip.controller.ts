@@ -22,8 +22,8 @@ export class TripController {
         try {
             const { destination_id, quantity, pay_type_id, schedule_at } = req.body
 
-             const user = (req as any).user;
-            const created_by = (req as any).user;
+            const user = (req as any).user
+            const created_by = (req as any).user
 
             const trip = await this.service.create({
                 destination_id: parseInt(destination_id),
@@ -74,7 +74,7 @@ export class TripController {
 
     getAllByUserId = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = (req as any).user;
+            const userId = (req as any).user
             const trips = await this.service.findAllByUserIdAndStatus(userId)
 
             const serializedTrips = await Promise.all(
@@ -113,7 +113,7 @@ export class TripController {
 
     cancelTrip = async (req: Request, res: Response, next: NextFunction) => {
         try {
-           const user = (req as any).user;
+            const user = (req as any).user
             // const user = req.user?.user_id || ''
             const trip = await this.service.findById(parseInt(req.params.id))
             if (!trip) throw new NotFoundError('Trip not found')

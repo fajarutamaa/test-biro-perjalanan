@@ -31,7 +31,7 @@ build/
 # Hapus *.js dan *.js.map jika Anda butuh file JS lain
 # *.js
 # *.js.map
-*.d.ts
+.d.ts
 
 # Logs
 logs
