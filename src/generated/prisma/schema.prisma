@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["master", "public"]
+}
+
+model tb_destination {
+  destination_id BigInt    @id(map: "tb_destination_pk") @default(autoincrement())
+  name           String?   @db.VarChar
+  destinations   String[]  @db.VarChar
+  quota          BigInt?
+  is_open        Boolean?
+  price          Decimal?  @db.Decimal
+  tb_trip        tb_trip[]
+
+  @@schema("master")
+}
+
+model tb_payment_status {
+  pay_status_id      BigInt               @id(map: "tb_payment_status_pk") @default(autoincrement())
+  Name               String?              @db.VarChar
+  tb_payment_history tb_payment_history[]
+
+  @@schema("master")
+}
+
+model tb_payment_type {
+  pay_type_id     BigInt            @id(map: "tb_payment_type_pk") @default(autoincrement())
+  name            String?           @db.VarChar
+  tb_trip_invoice tb_trip_invoice[]
+
+  @@schema("master")
+}
+
+model tb_role {
+  role_id Int       @id(map: "Role_pkey") @default(autoincrement())
+  name    String    @unique(map: "Role_name_key")
+  tb_user tb_user[]
+
+  @@schema("master")
+}
+
+model tb_trip_status {
+  trip_status_id BigInt    @id(map: "tb_trip_status_pk") @default(autoincrement())
+  name           String?   @db.VarChar
+  tb_trip        tb_trip[]
+
+  @@schema("master")
+}
+
+model tb_payment_history {
+  pay_hist_id       BigInt             @id(map: "tb_payment_history_pk") @default(autoincrement())
+  pay_status_id     BigInt?
+  created_at        DateTime?          @db.Timestamptz(6)
+  trip_invoice_id   BigInt?
+  tb_payment_status tb_payment_status? @relation(fields: [pay_status_id], references: [pay_status_id], onDelete: NoAction, onUpdate: NoAction, map: "tb_payment_history_tb_payment_status_fk")
+  tb_trip_invoice   tb_trip_invoice?   @relation(fields: [trip_invoice_id], references: [trip_invoice_id], onDelete: NoAction, onUpdate: NoAction, map: "tb_payment_history_tb_trip_invoice_fk")
+
+  @@schema("public")
+}
+
+model tb_trip {
+  trip_id         BigInt            @id @default(autoincrement())
+  user_id         String            @db.Uuid
+  destination_id  BigInt
+  start_time      DateTime?         @db.Timestamptz(6)
+  end_time        DateTime?         @db.Timestamptz(6)
+  created_at      DateTime?         @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime?         @default(now()) @db.Timestamptz(6)
+  trip_status     BigInt?
+  schedule_at     DateTime?         @db.Date
+  created_by      String?           @db.VarChar
+  updated_by      String?           @db.VarChar
+  tb_destination  tb_destination    @relation(fields: [destination_id], references: [destination_id], onDelete: NoAction, onUpdate: NoAction, map: "tb_trip_tb_destination_fk")
+  tb_trip_status  tb_trip_status?   @relation(fields: [trip_status], references: [trip_status_id], onDelete: NoAction, onUpdate: NoAction, map: "tb_trip_tb_trip_status_fk")
+  tb_user         tb_user           @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+  tb_trip_invoice tb_trip_invoice[]
+
+  @@schema("public")
+}
+
+model tb_trip_invoice {
+  trip_invoice_id    BigInt               @id(map: "tb_trip_invoice_pk") @default(autoincrement())
+  invoice_no         String?              @db.VarChar
+  quantity           BigInt?
+  total_amount       Decimal?             @db.Decimal
+  pay_type_id        BigInt?
+  trip_id            BigInt?
+  tb_payment_history tb_payment_history[]
+  tb_payment_type    tb_payment_type?     @relation(fields: [pay_type_id], references: [pay_type_id], onDelete: NoAction, onUpdate: NoAction, map: "tb_trip_invoice_tb_payment_type_fk")
+  tb_trip            tb_trip?             @relation(fields: [trip_id], references: [trip_id], onDelete: NoAction, onUpdate: NoAction, map: "tb_trip_invoice_tb_trip_fk")
+
+  @@schema("public")
+}
+
+model tb_user {
+  user_id    String    @id(map: "User_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  email      String    @unique(map: "User_email_key")
+  password   String
+  role_id    Int
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  created_by String?   @db.Uuid
+  updated_by String?   @db.Uuid
+  is_active  Boolean?
+  tb_trip    tb_trip[]
+  tb_role    tb_role   @relation(fields: [role_id], references: [role_id], onUpdate: NoAction, map: "User_role_id_fkey")
+
+  @@schema("public")
+}
