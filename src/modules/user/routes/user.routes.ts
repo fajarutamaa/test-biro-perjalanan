@@ -10,8 +10,9 @@ router.post('/register', controller.register)
 router.post('/login', controller.login)
 
 // Protected routes
-router.get('/me', authenticateJWT, controller.getProfile)
-router.put('/me', authenticateJWT, controller.update)
-router.delete('/me', authenticateJWT, controller.delete)
+router.get('/profile', authenticateJWT, controller.getProfile)
+router.put('/update-profile', authenticateJWT, controller.update)
+
+router.delete('/delete', authenticateJWT, controller.delete)
 
 export default router

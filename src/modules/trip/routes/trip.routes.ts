@@ -29,8 +29,8 @@ const controller = new TripController(service, serviceInvoice, payHisttoryPaymen
 const router = Router()
 
 router.post('/', authenticateJWT, controller.create)
-// router.get('admin', authenticateJWT, authorizeRoles(1, 2), controller.getAll)
 router.get('/', authenticateJWT, controller.getAllByUserId)
+router.get('/:id', authenticateJWT, controller.getTripById)
 router.put('/:id', authenticateJWT, controller.cancelTrip)
 
 export default router

@@ -43,7 +43,7 @@ export class UserController {
         try {
             const userId = (req as any).user?.user_id
             const updated = await userService.updateUser(userId, req.body)
-            res.status(200).json({ message: 'User updated', user: updated })
+            return createdResponse(res, 201, 'OK', 'User updated successfully')
         } catch (error) {
             next(error)
         }
@@ -54,6 +54,16 @@ export class UserController {
             const userId = (req as any).user?.user_id
             await userService.deleteUser(userId)
             res.status(200).json({ message: 'User deleted' })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async deletedById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = req.params.id
+            await userService.deleteUser(userId)
+            return successResponse(res, 'User has been deleted')
         } catch (error) {
             next(error)
         }

@@ -7,7 +7,7 @@ import { createdResponse, successResponse } from '@/utils/response'
 import { responseTrips } from '../responses/user.responses'
 import { MasterDestinationsService } from '@/modules/master/services/destinations.service'
 import { UserService } from '@/modules/user/services/user.service'
-import { BadRequestError, NotFoundError } from '@/utils/error'
+import { NotFoundError } from '@/utils/error'
 
 export class TripController {
     constructor(
@@ -105,22 +105,31 @@ export class TripController {
         }
     }
 
-    getById = async (req: Request, res: Response) => {
-        const trip = await this.service.findById(parseInt(req.params.id))
-        if (!trip) return res.status(404).json({ message: 'Trip not found' })
-        res.json(trip)
+    getTripById = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const user = (req as any).user
+            const trip = await this.service.findById(parseInt(req.params.id))
+            if (user.role_id !== 1 && user.role_id !== 2) {
+                if (trip.user_id != user.user_id) {
+                    throw new NotFoundError('Trip not found')
+                }
+            }
+            if (!trip) throw new NotFoundError('Trip not found')
+            return successResponse(res, trip, 200, 'Trip retrieved successfully')
+        } catch (error) {
+            next(error)
+        }
     }
 
     cancelTrip = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const user = (req as any).user
-            // const user = req.user?.user_id || ''
             const trip = await this.service.findById(parseInt(req.params.id))
             if (!trip) throw new NotFoundError('Trip not found')
 
             await this.service.update(parseInt(req.params.id), {
                 trip_status: BigInt(4),
-                updated_by: user,
+                updated_by: user.user_id,
                 updated_at: new Date(),
             })
 

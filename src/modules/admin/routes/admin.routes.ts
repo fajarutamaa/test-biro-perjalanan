@@ -30,10 +30,14 @@ const router = Router()
 const userController = new UserController()
 const tripCcontroller = new TripController(service, serviceInvoice, payHisttoryPayment, serviceDestination, serviceUser)
 
+const isAdmin = authorizeRoles(1, 2)
+
 // user management
-router.get('/users', authenticateJWT, authorizeRoles(1, 2), userController.list)
+router.get('/users', authenticateJWT, isAdmin, userController.list)
+router.delete('/users/:id', authenticateJWT, isAdmin, userController.deletedById)
 
 // trip mamangement
-router.get('/trips', authenticateJWT, authorizeRoles(1, 2), tripCcontroller.getAll)
+router.get('/trips', authenticateJWT, isAdmin, tripCcontroller.getAll)
+router.get('/trips/:id', authenticateJWT, isAdmin, tripCcontroller.getTripById)
 
 export default router
