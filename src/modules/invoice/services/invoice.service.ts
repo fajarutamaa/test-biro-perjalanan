@@ -17,6 +17,10 @@ export class TripInvoiceService {
         return this.repo.findById(id)
     }
 
+    findByTripId(tripId: number) {
+        return this.repo.findByTripId(tripId)
+    }
+
     update(id: number, data: Partial<tb_trip_invoice>) {
         return this.repo.update(id, data)
     }

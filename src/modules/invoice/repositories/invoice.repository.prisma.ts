@@ -26,6 +26,10 @@ export class PrismaTripInvoiceRepository implements TripInvoiceRepository {
         return prisma.tb_trip_invoice.findFirst({ where: { invoice_no } })
     }
 
+    async findByTripId(tripId: number): Promise<tb_trip_invoice | null> {
+        return prisma.tb_trip_invoice.findFirst({ where: { trip_id: tripId } })
+    }
+
     async update(trip_invoice_id: number, data: Partial<tb_trip_invoice>): Promise<tb_trip_invoice> {
         return prisma.tb_trip_invoice.update({ where: { trip_invoice_id }, data })
     }

@@ -126,6 +126,8 @@ export class TripController {
             const destination = await this.serviceDestination.findById(Number(trip.destination_id))
             const user = await this.serviceUser.getUserById(trip.user_id)
             const tripStatus = await this.serviceTripStatus.findById(Number(trip.trip_status))
+            const tripInvoice = await this.serviceInvoice.findByTripId(Number(trip.trip_id))
+            const payType = await this.servicePayType.findById(Number(tripInvoice?.pay_type_id))
 
             let response = {
                 id: Number(trip.trip_id),
@@ -141,6 +143,9 @@ export class TripController {
                     name: user?.name || null,
                     email: user?.email || null,
                 },
+                quantity: parseInt(tripInvoice?.quantity.toString()),
+                total_amount: tripInvoice?.total_amount,
+                pay_type: payType?.name,
                 schedule_at: trip.schedule_at,
                 created_by: trip.created_by,
             }
