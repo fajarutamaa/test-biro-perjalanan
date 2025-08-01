@@ -1,6 +1,6 @@
-# ✈️ Mlaku-Mulu Travel Agency - Backend API
+# ✈️ Travel Agency - Backend API
 
-A RESTful backend application developed for **Mlaku-Mulu Travel Agency**. This system allows staff to manage tourist data and travel histories securely. Only authenticated employees can access or modify sensitive data, while tourists can view their own travel records.
+A RESTful backend application developed for **Travel Agency**. This system allows staff to manage tourist data and travel histories securely. Only authenticated employees can access or modify sensitive data, while tourists can view their own travel records.
 
 ---
 
@@ -27,16 +27,16 @@ test-biro-perjalanan/
 
 ## 🛠️ Tech Stack
 
-- **Node.js** & **Express** – REST API backend framework
-- **TypeScript** – Type-safe JavaScript
-- **Prisma ORM** – Database schema & access layer
-- **PostgreSQL** – Relational database (assumed default)
-- **JWT** – Secure authentication
-- **Jest** – Testing framework
-- **Dotenv** – Environment variable management
-- **Prettier** – Code formatter
-- **Railway** – Continuous integration and deployment
-- **Winston** – Logging
+- **Node.js** & **Express** — Backend framework for building RESTful APIs  
+- **TypeScript** — Strongly typed superset of JavaScript  
+- **Prisma ORM** — Type-safe database client and schema management  
+- **PostgreSQL** — Relational database (default choice)  
+- **JWT (JSON Web Tokens)** — Stateless authentication mechanism  
+- **Jest** — JavaScript testing framework  
+- **Dotenv** — Environment variable loader for `.env` files  
+- **Prettier** — Opinionated code formatter  
+- **Railway** — CI/CD platform for deployment and infrastructure  
+- **Winston** — Versatile logging library for Node.js
 
 ---
 
@@ -105,7 +105,7 @@ Make sure to set up your environment variables (`{{baseUrl}}`, `{{authToken}}`, 
 ![Railway Logo](https://img.shields.io/badge/Railway-131415?style=for-the-badge&logo=railway&logoColor=white)  
 This project is deployed on [Railway](https://railway.app) and accessible via the following public URL:
 
-🔗 **Live API Endpoint**: [View API Endpoint](https://test-biro-perjalanan.up.railway.app)
+🔗 **Live API Endpoint**: [View API Endpoint](https://test-biro-perjalanan-production.up.railway.app/)
 
 Use this endpoint as the base URL for testing with Postman or integrating with frontend apps.
 
