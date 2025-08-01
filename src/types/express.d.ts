@@ -1,8 +1,5 @@
-// src/types/express.d.ts
-
 import { Request } from 'express'
 
-// Define JwtPayload for your custom user claims
 export interface JwtPayload {
     user_id: string
     email: string
@@ -13,7 +10,6 @@ export interface JwtPayload {
     exp?: number
 }
 
-// Extend Express Request
 declare module 'express-serve-static-core' {
     interface Request {
         user?: JwtPayload

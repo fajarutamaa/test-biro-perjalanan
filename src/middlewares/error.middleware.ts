@@ -1,6 +1,5 @@
-// middlewares/errorHandler.ts
 import { Request, Response, NextFunction } from 'express'
-import { AppError } from '../utils/error' // atau path sesuai kamu
+import { AppError } from '../utils/error'
 
 export const errorHandler = (err: Error, _req: Request, res: Response, _next: NextFunction) => {
     if (err instanceof AppError) {
@@ -11,7 +10,6 @@ export const errorHandler = (err: Error, _req: Request, res: Response, _next: Ne
         })
     }
 
-    // Unexpected Error
     return res.status(500).json({
         code: 500,
         status: 'Internal Server Error',
