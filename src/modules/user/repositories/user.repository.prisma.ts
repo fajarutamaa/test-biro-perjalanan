@@ -3,7 +3,7 @@ import { prisma } from '@/config/prisma'
 import { IUserRepository } from './user.repository'
 
 export class UserRepository implements IUserRepository {
-    async create(data: { email: string; password: string; name: string; role_id: number }): Promise<tb_user> {
+    async create(data: { email: string; password: string; name: string; role_id: number, is_active: boolean }): Promise<tb_user> {
         return prisma.tb_user.create({ data })
     }
 

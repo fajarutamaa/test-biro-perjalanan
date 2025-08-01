@@ -31,6 +31,7 @@ export class UserService {
         return this.userRepository.create({
             ...data,
             role_id: 3,
+            is_active: true,
             password: hashedPassword,
         })
     }
