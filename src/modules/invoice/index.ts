@@ -1,3 +1,3 @@
-import tripRoutes from './routes/invoice.routes'
+import invoiceRoutes from './routes/invoice.routes'
 
-export { tripRoutes }
+export { invoiceRoutes }

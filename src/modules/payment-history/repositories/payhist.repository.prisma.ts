@@ -8,4 +8,11 @@ export class PrismaPaymentHistoryRepository implements PayHistoryRepository {
         const trip = await prisma.tb_payment_history.create({ data })
         return
     }
+
+    async findByTripInvoiceId(trip_invoice_id: number): Promise<tb_payment_history | null> {
+        return await prisma.tb_payment_history.findFirst({
+            where: { trip_invoice_id },
+            orderBy: { created_at: 'desc' },
+        })
+    }
 }

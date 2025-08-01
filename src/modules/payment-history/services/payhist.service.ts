@@ -8,4 +8,8 @@ export class TripPayHistoryService {
     create(data: CreatePayHistoryDTO) {
         return this.repo.createPaymentHistory(data)
     }
+
+    findByTripInvoiceId(trip_invoice_id: number) {
+        return this.repo.findByTripInvoiceId(trip_invoice_id)
+    }
 }

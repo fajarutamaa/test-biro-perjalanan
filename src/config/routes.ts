@@ -3,11 +3,14 @@ import { userRoutes } from '@/modules/user'
 import { tripRoutes } from '@/modules/trip'
 import { destinationsRoutes, payTypeRoutes, tripStatusRoutes } from '@/modules/master'
 import { adminRoutes } from '@/modules/admin'
+import { invoiceRoutes } from '@/modules/invoice'
 
 export const routes = (app: Express) => {
     app.use('/api/trips', tripRoutes)
     app.use('/api/users', userRoutes)
+    app.use('/api/invoice', invoiceRoutes)
 
+    // admin routes
     app.use('/api/admin', adminRoutes)
 
     // master routes

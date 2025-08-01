@@ -14,4 +14,11 @@ export class PrismaMasterDestinationsRepository implements MasterDestinationsRep
     async findById(destination_id: number): Promise<tb_destination | null> {
         return prisma.tb_destination.findUnique({ where: { destination_id } })
     }
+
+    async update(destination_id: number, data: any): Promise<void> {
+        await prisma.tb_destination.update({
+            where: { destination_id },
+            data,
+        })
+    }
 }

@@ -10,6 +10,7 @@ import { UserService } from '@/modules/user/services/user.service'
 import { BadRequestError, NotFoundError } from '@/utils/error'
 import { MasterPayTypeService } from '@/modules/master/services/paytype.service'
 import { MasterTripStatusService } from '@/modules/master/services/tripstatus.service'
+import { start } from 'repl'
 
 export class TripController {
     constructor(
@@ -37,6 +38,10 @@ export class TripController {
             const destination = await this.serviceDestination.findById(destination_id)
             const totalAmount = Number(destination?.price) * quantity
 
+            if (Number(destination?.quota) < quantity) {
+                throw new BadRequestError('Quota is not enough')
+            }
+
             const tripInvoice = await this.serviceInvoice.create({
                 invoice_no: generateInvoiceNumber(),
                 trip_id: trip,
@@ -48,6 +53,11 @@ export class TripController {
             await this.servicePaymentHistory.create({
                 trip_invoice_id: tripInvoice,
                 pay_status_id: BigInt(1),
+                created_at: new Date(),
+            })
+
+            await this.serviceDestination.update(destination_id, {
+                quota: Number(destination?.quota) - quantity,
             })
 
             return createdResponse(res, 201, 'OK', 'Trip created successfully')
@@ -60,16 +70,43 @@ export class TripController {
     getAll = async (_: Request, res: Response) => {
         try {
             const trips = await this.service.findAll()
-            const serializedTrips = trips.map((trip) => ({
-                ...trip,
-                id: trip.trip_id?.toString(),
-                destination_id: trip.destination_id?.toString(),
-                trip_status: trip.trip_status?.toString(),
-            }))
 
-            return successResponse(res, responseTrips(serializedTrips), 200, 'Trips retrieved successfully')
+            const responses = []
+
+            for (const trip of trips) {
+                const destination = await this.serviceDestination.findById(Number(trip.destination_id))
+                const user = await this.serviceUser.getUserById(trip.user_id)
+                const tripStatus = await this.serviceTripStatus.findById(Number(trip.trip_status))
+                const tripInvoice = await this.serviceInvoice.findByTripId(Number(trip.trip_id))
+                const payType = tripInvoice ? await this.servicePayType.findById(Number(tripInvoice.pay_type_id)) : null
+
+                responses.push({
+                    id: parseInt(trip.trip_id?.toString()),
+                    destination: {
+                        id: parseInt(trip.destination_id?.toString()),
+                        name: destination?.name || null,
+                        benefit: destination?.destinations || null,
+                    },
+                    start_time: trip.start_time,
+                    end_time: trip.end_time,
+                    user: {
+                        id: user?.user_id?.toString() || null,
+                        name: user?.name || null,
+                        email: user?.email || null,
+                    },
+                    name: tripStatus?.name || null,
+                    invoice: {
+                        invoice_no: tripInvoice?.invoice_no || null,
+                        total_amount: tripInvoice?.total_amount?.toString() || null,
+                        quantity: tripInvoice?.quantity?.toString() || null,
+                        pay_type: payType?.name || null,
+                    },
+                })
+            }
+            return successResponse(res, responses, 200, 'Trips retrieved successfully')
         } catch (error) {
-            console.log(error)
+            console.error(error)
+            return res.status(500).json({ message: 'Failed to retrieve trips', error })
         }
     }
 
@@ -82,20 +119,33 @@ export class TripController {
                 trips.map(async (trip) => {
                     const destination = await this.serviceDestination.findById(Number(trip.destination_id))
                     const user = await this.serviceUser.getUserById(userId)
+                    const tripStatus = await this.serviceTripStatus.findById(Number(trip.trip_status))
+                    const tripInvoice = await this.serviceInvoice.findByTripId(Number(trip.trip_id))
+                    const payType = tripInvoice
+                        ? await this.servicePayType.findById(Number(tripInvoice.pay_type_id))
+                        : null
 
                     return {
-                        id: Number(trip.trip_id),
+                        id: parseInt(trip.trip_id?.toString()),
                         destination: {
+                            id: parseInt(trip.destination_id?.toString()),
                             name: destination?.name || null,
                             benefit: destination?.destinations || null,
                         },
-                        trip_status: Number(trip.trip_status),
+                        start_time: trip.start_time,
+                        end_time: trip.end_time,
                         user: {
+                            id: user?.user_id?.toString() || null,
                             name: user?.name || null,
                             email: user?.email || null,
                         },
-                        schedule_at: trip.schedule_at,
-                        created_by: trip.created_by,
+                        name: tripStatus?.name || null,
+                        invoice: {
+                            invoice_no: tripInvoice?.invoice_no || null,
+                            total_amount: tripInvoice?.total_amount?.toString() || null,
+                            quantity: tripInvoice?.quantity?.toString() || null,
+                            pay_type: payType?.name || null,
+                        },
                     }
                 })
             )
@@ -112,7 +162,7 @@ export class TripController {
             const { role_id: userRole, user_id: userId } = (req as any).user || {}
             const tripId = parseInt(req.params.id)
             if (isNaN(tripId)) {
-                throw new BadRequestError('Invalid trip ID')
+                throw new BadRequestError('Invalid trip Id')
             }
             const trip = await this.service.findById(tripId)
             if (userRole !== 1 && userRole !== 2) {

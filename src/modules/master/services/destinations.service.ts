@@ -16,4 +16,8 @@ export class MasterDestinationsService {
     findById(destination_id: number) {
         return this.repo.findById(destination_id)
     }
+
+    update(destination_id: number, data: any) {
+        return this.repo.update(destination_id, data)
+    }
 }
