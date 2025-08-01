@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import config from '../config'
-
-// Define JwtPayload interface locally if not imported
+import { ForbiddenError, UnauthorizedError } from '@/utils/error'
 interface JwtPayload {
     user_id: string
     email: string
@@ -12,16 +11,15 @@ interface JwtPayload {
     exp?: number
 }
 
-// Extend Request interface locally
 interface AuthenticatedRequest extends Request {
-    user?: JwtPayload
+    user: JwtPayload
 }
 
 export const authenticateJWT = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Missing or invalid Authorization header' })
+        throw new UnauthorizedError('Missing or invalid Authorization header')
     }
 
     const token = authHeader.split(' ')[1]
@@ -31,7 +29,7 @@ export const authenticateJWT = (req: AuthenticatedRequest, res: Response, next: 
         req.user = decoded
         next()
     } catch (err) {
-        return res.status(401).json({ error: 'Invalid or expired token' })
+        throw new UnauthorizedError('Invalid token')
     }
 }
 
@@ -40,11 +38,7 @@ export function authorizeRoles(...allowedRoles: number[]) {
         const user = req.user
 
         if (!user || !allowedRoles.includes(user.role_id)) {
-            return res.status(403).json({
-                code: 403,
-                status: 'Forbidden',
-                message: 'You do not have permission to perform this action',
-            })
+            throw new ForbiddenError('You do not have permission to perform this action')
         }
         next()
     }

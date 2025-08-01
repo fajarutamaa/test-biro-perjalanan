@@ -22,8 +22,6 @@ export class PrismaTripRepository implements TripRepository {
         return prisma.tb_trip.findMany({
             where: {
                 user_id,
-                // trip_status: status,
-                // Tambahkan kondisi untuk payment history yang sukses
                 tb_trip_invoice: {
                     some: {
                         tb_payment_history: {

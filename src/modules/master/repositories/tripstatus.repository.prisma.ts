@@ -6,4 +6,8 @@ export class PrismaMasterTripStatusRepository implements MasterTripStatusReposit
     async findAll(): Promise<tb_trip_status[]> {
         return await prisma.tb_trip_status.findMany()
     }
+
+    async findById(id: number): Promise<tb_trip_status | null> {
+        return await prisma.tb_trip_status.findUnique({ where: { trip_status_id: id } })
+    }
 }

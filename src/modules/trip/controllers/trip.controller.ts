@@ -7,7 +7,9 @@ import { createdResponse, successResponse } from '@/utils/response'
 import { responseTrips } from '../responses/user.responses'
 import { MasterDestinationsService } from '@/modules/master/services/destinations.service'
 import { UserService } from '@/modules/user/services/user.service'
-import { NotFoundError } from '@/utils/error'
+import { BadRequestError, NotFoundError } from '@/utils/error'
+import { MasterPayTypeService } from '@/modules/master/services/paytype.service'
+import { MasterTripStatusService } from '@/modules/master/services/tripstatus.service'
 
 export class TripController {
     constructor(
@@ -15,22 +17,21 @@ export class TripController {
         private readonly serviceInvoice: TripInvoiceService,
         private readonly servicePaymentHistory: TripPayHistoryService,
         private readonly serviceDestination: MasterDestinationsService,
-        private readonly serviceUser: UserService
+        private readonly serviceUser: UserService,
+        private readonly serviceTripStatus: MasterTripStatusService,
+        private readonly servicePayType: MasterPayTypeService
     ) {}
 
     create = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { destination_id, quantity, pay_type_id, schedule_at } = req.body
-
-            const user = (req as any).user
-            const created_by = (req as any).user
-
+            const { user_id: userId } = (req as any).user || {}
             const trip = await this.service.create({
                 destination_id: parseInt(destination_id),
                 schedule_at: new Date(schedule_at),
                 trip_status: 1,
-                user_id: user.user_id,
-                created_by: created_by,
+                user_id: userId,
+                created_by: userId,
             })
 
             const destination = await this.serviceDestination.findById(destination_id)
@@ -74,13 +75,13 @@ export class TripController {
 
     getAllByUserId = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = (req as any).user
+            const { user_id: userId } = (req as any).user || {}
             const trips = await this.service.findAllByUserIdAndStatus(userId)
 
             const serializedTrips = await Promise.all(
                 trips.map(async (trip) => {
                     const destination = await this.serviceDestination.findById(Number(trip.destination_id))
-                    const user = await this.serviceUser.getUserById(userId.user_id)
+                    const user = await this.serviceUser.getUserById(userId)
 
                     return {
                         id: Number(trip.trip_id),
@@ -101,35 +102,65 @@ export class TripController {
 
             return successResponse(res, serializedTrips, 200, 'Trips retrieved successfully')
         } catch (error) {
+            console.log(error)
             next(error)
         }
     }
 
     getTripById = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = (req as any).user
-            const trip = await this.service.findById(parseInt(req.params.id))
-            if (user.role_id !== 1 && user.role_id !== 2) {
-                if (trip.user_id != user.user_id) {
+            const { role_id: userRole, user_id: userId } = (req as any).user || {}
+            const tripId = parseInt(req.params.id)
+            if (isNaN(tripId)) {
+                throw new BadRequestError('Invalid trip ID')
+            }
+            const trip = await this.service.findById(tripId)
+            if (userRole !== 1 && userRole !== 2) {
+                if (trip.user_id != userId) {
                     throw new NotFoundError('Trip not found')
                 }
             }
+
             if (!trip) throw new NotFoundError('Trip not found')
-            return successResponse(res, trip, 200, 'Trip retrieved successfully')
+
+            const destination = await this.serviceDestination.findById(Number(trip.destination_id))
+            const user = await this.serviceUser.getUserById(trip.user_id)
+            const tripStatus = await this.serviceTripStatus.findById(Number(trip.trip_status))
+
+            let response = {
+                id: Number(trip.trip_id),
+                destination: {
+                    id: Number(trip.destination_id),
+                    name: destination?.name || null,
+                    benefit: destination?.destinations || null,
+                },
+                start_time: trip.start_time,
+                end_time: trip.end_time,
+                trip_status: tripStatus.name,
+                user: {
+                    name: user?.name || null,
+                    email: user?.email || null,
+                },
+                schedule_at: trip.schedule_at,
+                created_by: trip.created_by,
+            }
+
+            return successResponse(res, response, 200, 'Trip retrieved successfully')
         } catch (error) {
+            console.log(error)
             next(error)
         }
     }
 
     cancelTrip = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = (req as any).user
+            const userId = (req as any).user?.user_id
             const trip = await this.service.findById(parseInt(req.params.id))
             if (!trip) throw new NotFoundError('Trip not found')
 
             await this.service.update(parseInt(req.params.id), {
                 trip_status: BigInt(4),
-                updated_by: user.user_id,
+                updated_by: userId,
                 updated_at: new Date(),
             })
 

@@ -16,5 +16,5 @@ export interface JwtPayload {
 
 // Export other types as needed
 export interface AuthenticatedRequest extends Request {
-    user: JwtPayload // Make it required if you're sure it will be set
+    user?: JwtPayload // Make it required if you're sure it will be set
 }

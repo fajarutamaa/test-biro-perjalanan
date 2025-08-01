@@ -7,4 +7,13 @@ export class MasterPayTypeService {
         const data = await this.repo.findAll()
         return data
     }
+
+    async findById(id: number) {
+        const data = await this.repo.findById(id)
+        if (!data) return null
+        return {
+            ...data,
+            pay_type_id: Number(data.pay_type_id),
+        }
+    }
 }

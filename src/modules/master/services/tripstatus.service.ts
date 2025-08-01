@@ -12,4 +12,13 @@ export class MasterTripStatusService {
 
         return result
     }
+
+    async findById(id: number) {
+        const data = await this.repo.findById(id)
+        if (!data) return null
+        return {
+            ...data,
+            trip_status_id: Number(data.trip_status_id),
+        }
+    }
 }
