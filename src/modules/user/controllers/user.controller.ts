@@ -4,6 +4,7 @@ import { RegisterDTO, LoginDTO } from '../dtos'
 import { createdResponse, successResponse } from '@/utils/response'
 import { responseUsers } from '../responses/user.responses'
 import { NotFoundError } from '@/utils/error'
+import logger from '@/utils/logger'
 
 const userService = new UserService()
 
@@ -22,8 +23,9 @@ export class UserController {
         try {
             const dto: LoginDTO = req.body
             const result = await userService.login(dto.email, dto.password)
-            return successResponse(res, result)
+            return successResponse(res, result, 200, 'User logged in successfully')
         } catch (error) {
+            logger.error(error)
             next(error)
         }
     }
@@ -42,6 +44,7 @@ export class UserController {
             }
             return successResponse(res, result, 200, 'User retrieved successfully')
         } catch (error) {
+            logger.error(error)
             next(error)
         }
     }
@@ -62,7 +65,7 @@ export class UserController {
             await userService.deleteUser(userId, { is_active: false })
             return createdResponse(res, 201, 'OK', 'User deleted successfully')
         } catch (error) {
-            console.log(error)
+            logger.error(error)
             next(error)
         }
     }
@@ -73,6 +76,7 @@ export class UserController {
             await userService.deleteUser(userId, { is_active: false })
             return successResponse(res, 'User has been deleted')
         } catch (error) {
+            logger.error(error)
             next(error)
         }
     }
@@ -82,6 +86,7 @@ export class UserController {
             const users = await userService.listUsers()
             return successResponse(res, responseUsers(users))
         } catch (error) {
+            logger.error(error)
             next(error)
         }
     }

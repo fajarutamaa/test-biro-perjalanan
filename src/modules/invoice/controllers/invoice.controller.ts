@@ -4,6 +4,7 @@ import { BadRequestError, NotFoundError } from '@/utils/error'
 import { TripPayHistoryService } from '@/modules/payment-history/services/payhist.service'
 import { createdResponse, successResponse } from '@/utils/response'
 import { TripService } from '@/modules/trip/services/trip.service'
+import logger from '@/utils/logger'
 
 export class TripInvoiceController {
     constructor(
@@ -24,6 +25,7 @@ export class TripInvoiceController {
             }))
             return successResponse(res, serializedTrips, 200, 'Invoices retrieved successfully')
         } catch (error) {
+            logger.error(error)
             next(error)
         }
     }
@@ -33,19 +35,20 @@ export class TripInvoiceController {
             if (!req.params.id) {
                 throw new BadRequestError('Invalid invoice Id')
             }
-            const trip = await this.service.findById(parseInt(req.params.id))
-            if (!trip) throw new NotFoundError('Invoice not found')
+            const tripInvoice = await this.service.findById(parseInt(req.params.id))
+            if (!tripInvoice) throw new NotFoundError('Invoice not found')
 
             const result = {
-                id: trip.trip_invoice_id,
-                trip_id: trip.trip_id,
-                pay_type_id: trip.pay_type_id,
-                total_amount: trip.total_amount,
-                quantity: trip.quantity,
+                id: tripInvoice.trip_invoice_id,
+                trip_id: tripInvoice.trip_id,
+                pay_type_id: tripInvoice.pay_type_id,
+                total_amount: tripInvoice.total_amount,
+                quantity: tripInvoice.quantity,
             }
 
             return successResponse(res, result, 200, 'Invoice retrieved successfully')
         } catch (error) {
+            logger.error(error)
             next(error)
         }
     }
@@ -98,6 +101,7 @@ export class TripInvoiceController {
 
             return createdResponse(res, 201, 'OK', 'Payment status updated successfully')
         } catch (error) {
+            logger.error(error)
             next(error)
         }
     }

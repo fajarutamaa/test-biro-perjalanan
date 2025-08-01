@@ -4,13 +4,12 @@ import { TripInvoiceService } from '@/modules/invoice/services/invoice.service'
 import { TripPayHistoryService } from '@/modules/payment-history/services/payhist.service'
 import { generateInvoiceNumber } from '@/utils/helpers'
 import { createdResponse, successResponse } from '@/utils/response'
-import { responseTrips } from '../responses/user.responses'
 import { MasterDestinationsService } from '@/modules/master/services/destinations.service'
 import { UserService } from '@/modules/user/services/user.service'
 import { BadRequestError, NotFoundError } from '@/utils/error'
 import { MasterPayTypeService } from '@/modules/master/services/paytype.service'
 import { MasterTripStatusService } from '@/modules/master/services/tripstatus.service'
-import { start } from 'repl'
+import logger from '@/utils/logger'
 
 export class TripController {
     constructor(
@@ -62,12 +61,12 @@ export class TripController {
 
             return createdResponse(res, 201, 'OK', 'Trip created successfully')
         } catch (error) {
-            console.error(error)
+            logger.error(error)
             next(error)
         }
     }
 
-    getAll = async (_: Request, res: Response) => {
+    getAll = async (_: Request, res: Response, next: NextFunction) => {
         try {
             const trips = await this.service.findAll()
 
@@ -105,8 +104,8 @@ export class TripController {
             }
             return successResponse(res, responses, 200, 'Trips retrieved successfully')
         } catch (error) {
-            console.error(error)
-            return res.status(500).json({ message: 'Failed to retrieve trips', error })
+            logger.error(error)
+            next(error)
         }
     }
 
@@ -152,7 +151,7 @@ export class TripController {
 
             return successResponse(res, serializedTrips, 200, 'Trips retrieved successfully')
         } catch (error) {
-            console.log(error)
+            logger.error(error)
             next(error)
         }
     }
@@ -202,7 +201,7 @@ export class TripController {
 
             return successResponse(res, response, 200, 'Trip retrieved successfully')
         } catch (error) {
-            console.log(error)
+            logger.error(error)
             next(error)
         }
     }
@@ -233,7 +232,8 @@ export class TripController {
 
             return createdResponse(res, 201, 'OK', 'Trip status updated successfully')
         } catch (error) {
-            return next(error)
+            logger.error(error)
+            next(error)
         }
     }
 
@@ -242,6 +242,7 @@ export class TripController {
             const userId = (req as any).user?.user_id
             const trip = await this.service.findById(parseInt(req.params.id))
             if (!trip) throw new NotFoundError('Trip not found')
+            if (trip.trip_status != BigInt(1)) throw new BadRequestError('Trip cannot be cancelled')
 
             await this.service.update(parseInt(req.params.id), {
                 trip_status: BigInt(4),
@@ -251,6 +252,7 @@ export class TripController {
 
             return createdResponse(res, 201, 'OK', 'Trip cancelled successfully')
         } catch (error) {
+            logger.error(error)
             next(error)
         }
     }
