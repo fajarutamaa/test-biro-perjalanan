@@ -71,10 +71,8 @@ export class UserService {
         return this.userRepository.update(userId, data)
     }
 
-    async deleteUser(userId: string): Promise<void> {
-        await this.userRepository.update(userId, {
-            is_active: false,
-        })
+    async deleteUser(userId: string, data: Partial<tb_user>): Promise<void> {
+        await this.userRepository.update(userId, data)
     }
 
     async listUsers(): Promise<tb_user[]> {

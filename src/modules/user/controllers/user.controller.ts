@@ -59,9 +59,10 @@ export class UserController {
     async delete(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = (req as any).user?.user_id
-            await userService.deleteUser(userId)
-            res.status(200).json({ message: 'User deleted' })
+            await userService.deleteUser(userId, { is_active: false })
+            return createdResponse(res, 201, 'OK', 'User deleted successfully')
         } catch (error) {
+            console.log(error)
             next(error)
         }
     }
@@ -69,7 +70,7 @@ export class UserController {
     async deletedById(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.params.id
-            await userService.deleteUser(userId)
+            await userService.deleteUser(userId, { is_active: false })
             return successResponse(res, 'User has been deleted')
         } catch (error) {
             next(error)
