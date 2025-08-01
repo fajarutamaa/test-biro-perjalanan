@@ -55,5 +55,6 @@ router.delete('/users/:id', authenticateJWT, isAdmin, userController.deletedById
 // trip mamangement
 router.get('/trips', authenticateJWT, isAdmin, tripCcontroller.getAll)
 router.get('/trips/:id', authenticateJWT, isAdmin, tripCcontroller.getTripById)
+router.put('/trips/:id/status', authenticateJWT, isAdmin, tripCcontroller.updateStatusTrip)
 
 export default router

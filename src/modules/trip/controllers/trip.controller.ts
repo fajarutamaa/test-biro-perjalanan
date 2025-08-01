@@ -157,6 +157,36 @@ export class TripController {
         }
     }
 
+    updateStatusTrip = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const tripId = parseInt(req.params.id)
+            const { status } = req.body
+
+            const trip = await this.service.findById(tripId)
+            if (!trip) throw new NotFoundError('Trip not found')
+
+            const updatePayload: any = {
+                trip_status: BigInt(status),
+                updated_by: (req as any).user?.user_id,
+                updated_at: new Date(),
+            }
+
+            if (status === 3 && !trip.start_time) {
+                updatePayload.start_time = new Date()
+            }
+
+            if (status === 4) {
+                updatePayload.end_time = new Date()
+            }
+
+            await this.service.update(tripId, updatePayload)
+
+            return createdResponse(res, 201, 'OK', 'Trip status updated successfully')
+        } catch (error) {
+            return next(error)
+        }
+    }
+
     cancelTrip = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = (req as any).user?.user_id
