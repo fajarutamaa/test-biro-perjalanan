@@ -33,7 +33,14 @@ export class UserController {
             const userId = (req as any).user?.user_id
             const user = await userService.getUserById(userId)
             if (!user) throw new NotFoundError('User not found')
-            return successResponse(res, user, 200, 'User retrieved successfully')
+            const result = {
+                id: user.user_id,
+                name: user.name,
+                email: user.email,
+                is_active: user.is_active,
+                created_at: user.created_at,
+            }
+            return successResponse(res, result, 200, 'User retrieved successfully')
         } catch (error) {
             next(error)
         }
