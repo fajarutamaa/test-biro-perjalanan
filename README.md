@@ -36,6 +36,7 @@ test-biro-perjalanan/
 - **Dotenv** – Environment variable management
 - **Prettier** – Code formatter
 - **Railway** – Continuous integration and deployment
+- **Winston** – Logging
 
 ---
 
@@ -56,10 +57,11 @@ npm install
 
 ### Step 3: Configuration
 
-1. Copy the `.env.example` file to `.env`
-    ```bash
-    cp .env.example .env
-    ```
+Copy the `.env.example` file to `.env`
+
+```bash
+ cp .env.example .env
+```
 
 ### Step 4: Database Setup
 
@@ -73,7 +75,13 @@ npx prisma db push
 npm run dev
 ```
 
-### Step 6: Test the Server
+### Step 6: Run formatter
+
+```bash
+npm run format
+```
+
+### Step 7: Test the Server
 
 ```bash
 npm run test
@@ -83,9 +91,10 @@ npm run test
 
 ## 🔖 Documentation API
 
+![Postman Logo](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=Postman&logoColor=white)  
 You can test and explore all endpoints via Postman using the following collection:
 
-🔗 **Postman Collection**: [View API Collection]
+🔗 **Postman Collection**: [View API Collection](https://www.postman.com/bold-crescent-225387/personal/collection/zpzv0ei)
 
 Make sure to set up your environment variables (`{{baseUrl}}`, `{{authToken}}`, etc.) as required.
 
@@ -93,9 +102,10 @@ Make sure to set up your environment variables (`{{baseUrl}}`, `{{authToken}}`, 
 
 ## 🌍 Deployment
 
+![Railway Logo](https://img.shields.io/badge/Railway-131415?style=for-the-badge&logo=railway&logoColor=white)  
 This project is deployed on [Railway](https://railway.app) and accessible via the following public URL:
 
-🔗 **Live API Endpoint**:
+🔗 **Live API Endpoint**: [View API Endpoint](https://test-biro-perjalanan.up.railway.app)
 
 Use this endpoint as the base URL for testing with Postman or integrating with frontend apps.
 
