@@ -15,10 +15,11 @@ export const routes = (app: Express) => {
     app.use('/api/master/trip-status', tripStatusRoutes)
     app.use('/api/master/pay-type', payTypeRoutes)
 
-    app.get('/', (_req, res) => {
+    app.get('/', (req, res) => {
         res.status(200).json({
-            status: true,
-            message: 'OK',
+            code: 200,
+            status: 'OK',
+            message: 'Check Health Successfully - Fajar Dwi Utomo',
         })
     })
 }
