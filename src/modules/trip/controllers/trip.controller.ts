@@ -262,10 +262,18 @@ export class TripController {
             if (!trip) throw new NotFoundError('Trip not found')
             if (trip.trip_status != BigInt(1)) throw new BadRequestError('Trip cannot be cancelled')
 
-            await this.service.update(parseInt(req.params.id), {
-                trip_status: BigInt(4),
+            const updatedTrip = await this.service.update(parseInt(req.params.id), {
+                trip_status: BigInt(5),
                 updated_by: userId,
                 updated_at: new Date(),
+            })
+
+            const tripInvoiceId = await this.serviceInvoice.findByTripId(Number(updatedTrip.trip_id))
+
+            await this.servicePaymentHistory.create({
+                trip_invoice_id: Number(tripInvoiceId),
+                pay_status_id: BigInt(4),
+                created_at: new Date(),
             })
 
             return createdResponse(res, 201, 'OK', 'Trip cancelled successfully')
