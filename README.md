@@ -27,15 +27,15 @@ test-biro-perjalanan/
 
 ## 🛠️ Tech Stack
 
-- **Node.js** & **Express** — Backend framework for building RESTful APIs  
-- **TypeScript** — Strongly typed superset of JavaScript  
-- **Prisma ORM** — Type-safe database client and schema management  
-- **PostgreSQL** — Relational database (default choice)  
-- **JWT (JSON Web Tokens)** — Stateless authentication mechanism  
-- **Jest** — JavaScript testing framework  
-- **Dotenv** — Environment variable loader for `.env` files  
-- **Prettier** — Opinionated code formatter  
-- **Railway** — CI/CD platform for deployment and infrastructure  
+- **Node.js** & **Express** — Backend framework for building RESTful APIs
+- **TypeScript** — Strongly typed superset of JavaScript
+- **Prisma ORM** — Type-safe database client and schema management
+- **PostgreSQL** — Relational database (default choice)
+- **JWT (JSON Web Tokens)** — Stateless authentication mechanism
+- **Jest** — JavaScript testing framework
+- **Dotenv** — Environment variable loader for `.env` files
+- **Prettier** — Opinionated code formatter
+- **Railway** — CI/CD platform for deployment and infrastructure
 - **Winston** — Versatile logging library for Node.js
 
 ---

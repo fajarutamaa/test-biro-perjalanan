@@ -5,6 +5,7 @@ import { createdResponse, successResponse } from '@/utils/response'
 import { responseUsers } from '../responses/user.responses'
 import { NotFoundError } from '@/utils/error'
 import logger from '@/utils/logger'
+import { formatToIsoUtc7 } from '@/utils/helpers'
 
 const userService = new UserService()
 
@@ -40,7 +41,7 @@ export class UserController {
                 name: user.name,
                 email: user.email,
                 is_active: user.is_active,
-                created_at: user.created_at,
+                created_at: formatToIsoUtc7(user.created_at),
             }
             return successResponse(res, result, 200, 'User retrieved successfully')
         } catch (error) {
@@ -84,7 +85,7 @@ export class UserController {
     async list(req: Request, res: Response, next: NextFunction) {
         try {
             const users = await userService.listUsers()
-            return successResponse(res, responseUsers(users))
+            return successResponse(res, responseUsers(users), 200, 'User retrieved successfully')
         } catch (error) {
             logger.error(error)
             next(error)

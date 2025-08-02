@@ -80,7 +80,7 @@ export class TripInvoiceController {
                 throw new NotFoundError('Invoice not found')
             }
 
-            if (tripInvoice.total_amount !== amount) {
+            if (Number(tripInvoice.total_amount) !== amount) {
                 throw new BadRequestError('Amount is not correct')
             }
 

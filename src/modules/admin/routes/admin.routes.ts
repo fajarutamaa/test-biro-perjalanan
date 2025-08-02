@@ -16,6 +16,8 @@ import { PrismaMasterPayTypeRepository } from '@/modules/master/repositories/pay
 import { PrismaMasterTripStatusRepository } from '@/modules/master/repositories/tripstatus.repository.prisma'
 import { MasterTripStatusService } from '@/modules/master/services/tripstatus.service'
 import { MasterPayTypeService } from '@/modules/master/services/paytype.service'
+import { PrismaMasterPaymentStatusRepository } from '@/modules/master/repositories/paystatus.repository.prisma'
+import { MasterPaymentStatusService } from '@/modules/master/services/paystatus.service'
 
 const repo = new PrismaTripRepository()
 const repoPayHistory = new PrismaPaymentHistoryRepository()
@@ -24,6 +26,7 @@ const repoDestination = new PrismaMasterDestinationsRepository()
 const repoUser = new UserRepository()
 const repoTripStatus = new PrismaMasterTripStatusRepository()
 const repoPayType = new PrismaMasterPayTypeRepository()
+const repoPayStatus = new PrismaMasterPaymentStatusRepository()
 
 const service = new TripService(repo)
 const serviceInvoice = new TripInvoiceService(repoInvoice)
@@ -32,6 +35,7 @@ const serviceDestination = new MasterDestinationsService(repoDestination)
 const serviceUser = new UserService(repoUser)
 const serviceTripStatus = new MasterTripStatusService(repoTripStatus)
 const servicePayType = new MasterPayTypeService(repoPayType)
+const servicePayStatus = new MasterPaymentStatusService(repoPayStatus)
 
 const router = Router()
 
@@ -43,7 +47,8 @@ const tripCcontroller = new TripController(
     serviceDestination,
     serviceUser,
     serviceTripStatus,
-    servicePayType
+    servicePayType,
+    servicePayStatus
 )
 
 const isAdmin = authorizeRoles(1, 2)

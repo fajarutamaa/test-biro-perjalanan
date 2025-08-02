@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { TripService } from '../services/trip.service'
 import { TripInvoiceService } from '@/modules/invoice/services/invoice.service'
 import { TripPayHistoryService } from '@/modules/payment-history/services/payhist.service'
-import { generateInvoiceNumber } from '@/utils/helpers'
+import { formatToIsoUtc7, generateInvoiceNumber } from '@/utils/helpers'
 import { createdResponse, successResponse } from '@/utils/response'
 import { MasterDestinationsService } from '@/modules/master/services/destinations.service'
 import { UserService } from '@/modules/user/services/user.service'
@@ -10,6 +10,7 @@ import { BadRequestError, NotFoundError } from '@/utils/error'
 import { MasterPayTypeService } from '@/modules/master/services/paytype.service'
 import { MasterTripStatusService } from '@/modules/master/services/tripstatus.service'
 import logger from '@/utils/logger'
+import { MasterPaymentStatusService } from '@/modules/master/services/paystatus.service'
 
 export class TripController {
     constructor(
@@ -19,7 +20,8 @@ export class TripController {
         private readonly serviceDestination: MasterDestinationsService,
         private readonly serviceUser: UserService,
         private readonly serviceTripStatus: MasterTripStatusService,
-        private readonly servicePayType: MasterPayTypeService
+        private readonly servicePayType: MasterPayTypeService,
+        private readonly servicePayStatus: MasterPaymentStatusService
     ) {}
 
     create = async (req: Request, res: Response, next: NextFunction) => {
@@ -78,6 +80,10 @@ export class TripController {
                 const tripStatus = await this.serviceTripStatus.findById(Number(trip.trip_status))
                 const tripInvoice = await this.serviceInvoice.findByTripId(Number(trip.trip_id))
                 const payType = tripInvoice ? await this.servicePayType.findById(Number(tripInvoice.pay_type_id)) : null
+                const payHist = await this.servicePaymentHistory.findByTripInvoiceId(
+                    Number(tripInvoice?.trip_invoice_id)
+                )
+                const payStatus = await this.servicePayStatus.findById(Number(payHist?.pay_status_id))
 
                 responses.push({
                     id: parseInt(trip.trip_id?.toString()),
@@ -86,8 +92,8 @@ export class TripController {
                         name: destination?.name || null,
                         benefit: destination?.destinations || null,
                     },
-                    start_time: trip.start_time,
-                    end_time: trip.end_time,
+                    start_time: formatToIsoUtc7(trip.start_time),
+                    end_time: formatToIsoUtc7(trip.end_time),
                     user: {
                         id: user?.user_id?.toString() || null,
                         name: user?.name || null,
@@ -100,6 +106,8 @@ export class TripController {
                         quantity: tripInvoice?.quantity?.toString() || null,
                         pay_type: payType?.name || null,
                     },
+                    payment_status: payStatus?.Name || null,
+                    created_at: formatToIsoUtc7(trip.created_at),
                 })
             }
             return successResponse(res, responses, 200, 'Trips retrieved successfully')
@@ -123,6 +131,10 @@ export class TripController {
                     const payType = tripInvoice
                         ? await this.servicePayType.findById(Number(tripInvoice.pay_type_id))
                         : null
+                    const payHist = await this.servicePaymentHistory.findByTripInvoiceId(
+                        Number(tripInvoice?.trip_invoice_id)
+                    )
+                    const payStatus = await this.servicePayStatus.findById(Number(payHist?.pay_status_id))
 
                     return {
                         id: parseInt(trip.trip_id?.toString()),
@@ -131,20 +143,22 @@ export class TripController {
                             name: destination?.name || null,
                             benefit: destination?.destinations || null,
                         },
-                        start_time: trip.start_time,
-                        end_time: trip.end_time,
+                        start_time: formatToIsoUtc7(trip.start_time),
+                        end_time: formatToIsoUtc7(trip.end_time),
                         user: {
                             id: user?.user_id?.toString() || null,
                             name: user?.name || null,
                             email: user?.email || null,
                         },
-                        name: tripStatus?.name || null,
+                        trip_status: tripStatus?.name || null,
                         invoice: {
                             invoice_no: tripInvoice?.invoice_no || null,
                             total_amount: tripInvoice?.total_amount?.toString() || null,
                             quantity: tripInvoice?.quantity?.toString() || null,
                             pay_type: payType?.name || null,
                         },
+                        payment_status: payStatus?.Name || null,
+                        created_at: formatToIsoUtc7(trip.created_at),
                     }
                 })
             )
@@ -177,6 +191,8 @@ export class TripController {
             const tripStatus = await this.serviceTripStatus.findById(Number(trip.trip_status))
             const tripInvoice = await this.serviceInvoice.findByTripId(Number(trip.trip_id))
             const payType = await this.servicePayType.findById(Number(tripInvoice?.pay_type_id))
+            const payHist = await this.servicePaymentHistory.findByTripInvoiceId(Number(tripInvoice?.trip_invoice_id))
+            const payStatus = await this.servicePayStatus.findById(Number(payHist?.pay_status_id))
 
             let response = {
                 id: Number(trip.trip_id),
@@ -185,9 +201,9 @@ export class TripController {
                     name: destination?.name || null,
                     benefit: destination?.destinations || null,
                 },
-                start_time: trip.start_time,
-                end_time: trip.end_time,
-                trip_status: tripStatus.name,
+                start_time: formatToIsoUtc7(trip.start_time),
+                end_time: formatToIsoUtc7(trip.end_time),
+                trip_status: tripStatus?.name || null,
                 user: {
                     name: user?.name || null,
                     email: user?.email || null,
@@ -197,6 +213,8 @@ export class TripController {
                 pay_type: payType?.name,
                 schedule_at: trip.schedule_at,
                 created_by: trip.created_by,
+                payment_status: payStatus?.Name,
+                created_at: formatToIsoUtc7(trip.created_at),
             }
 
             return successResponse(res, response, 200, 'Trip retrieved successfully')

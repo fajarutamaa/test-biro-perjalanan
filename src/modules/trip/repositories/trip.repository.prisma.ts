@@ -40,6 +40,9 @@ export class PrismaTripRepository implements TripRepository {
                             where: {
                                 pay_status_id: 2,
                             },
+                            orderBy: {
+                                created_at: 'desc',
+                            },
                         },
                     },
                 },
